@@ -1,2 +1,10 @@
 /build/
+/glfw/build/
 /compile_commands.json
+
+# Downloaded dependency archives
+/glad.zip
+/glfw.zip
+
+# OS metadata
+.DS_Store
