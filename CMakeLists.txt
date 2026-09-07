@@ -11,20 +11,28 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 
-add_executable(learn_opengl
-    src/main.cpp
-    glad/src/gl.c
-)
+# Each lesson is deliberately a standalone executable.  That makes every
+# checkpoint independently buildable and prevents later lessons from changing
+# an earlier example.
+function(add_lesson target lesson_directory)
+  add_executable(${target}
+      ${lesson_directory}/main.cpp
+      glad/src/gl.c
+  )
 
-target_include_directories(learn_opengl PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
+  target_include_directories(${target} PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
+  )
 
-target_link_libraries(learn_opengl PRIVATE
-    glfw
-    OpenGL::GL
-)
+  target_link_libraries(${target} PRIVATE
+      glfw
+      OpenGL::GL
+  )
 
-target_compile_options(learn_opengl PRIVATE
-    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic>
-)
+  target_compile_options(${target} PRIVATE
+      $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic>
+  )
+endfunction()
+
+add_lesson(lesson_1_1_triangle lessons/1.1.triangle)
+add_lesson(lesson_1_2_rectangle lessons/1.2.rectangle)
