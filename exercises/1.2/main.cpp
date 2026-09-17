@@ -42,7 +42,7 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   GLFWwindow *window =
-      glfwCreateWindow(800, 600, "Lesson 1.1: Triangle", nullptr, nullptr);
+      glfwCreateWindow(800, 600, "Exercise 1.2", nullptr, nullptr);
   if (window == nullptr) {
     std::cerr << "Failed to create GLFW window\n";
     glfwTerminate();
@@ -60,11 +60,18 @@ int main() {
   glViewport(0, 0, 800, 600);
 
   // clang-format off
-  const float vertices[] = {
-    // first triangle
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f,
+  const float firstTriangleVertices[] = {
+    // left equilateral triangle
+    -0.8f, -0.5f, 0.0f,
+     0.0f, -0.5f, 0.0f,
+    -0.4f,  0.19282f, 0.0f,
+  };
+
+  const float secondTriangleVertices[] = {
+    // right equilateral triangle
+     0.0f, -0.5f, 0.0f,
+     0.8f, -0.5f, 0.0f,
+     0.4f,  0.19282f, 0.0f,
   };
   // clang-format on
 
@@ -83,18 +90,29 @@ int main() {
   glDeleteShader(vertexShader);
   glDeleteShader(fragmentShader);
 
-  unsigned int VAO = 0;
-  unsigned int VBO = 0;
-  glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &VBO);
-
-  // Configure the VAO once. It remembers that attribute 0 reads from vbo.
-  glBindVertexArray(VAO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  // first vao and vbo for first triangle
+  unsigned int firstTriangleVAO = 0;
+  unsigned int firstTriangleVBO = 0;
+  glGenVertexArrays(1, &firstTriangleVAO);
+  glGenBuffers(1, &firstTriangleVBO);
+  glBindVertexArray(firstTriangleVAO);
+  glBindBuffer(GL_ARRAY_BUFFER, firstTriangleVBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(firstTriangleVertices),
+               firstTriangleVertices, GL_STATIC_DRAW);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
-  glBindVertexArray(0);
+
+  // second vao and vbo for second triangle
+  unsigned int secondTriangleVAO = 0;
+  unsigned int secondTriangleVBO = 0;
+  glGenVertexArrays(1, &secondTriangleVAO);
+  glGenBuffers(1, &secondTriangleVBO);
+  glBindVertexArray(secondTriangleVAO);
+  glBindBuffer(GL_ARRAY_BUFFER, secondTriangleVBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangleVertices),
+               secondTriangleVertices, GL_STATIC_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
 
   while (glfwWindowShouldClose(window) == GLFW_FALSE) {
     processInput(window);
@@ -103,15 +121,22 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(shaderProgram);
-    glBindVertexArray(VAO);
+
+    glBindVertexArray(firstTriangleVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    glBindVertexArray(secondTriangleVAO);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
 
-  glDeleteVertexArrays(1, &VAO);
-  glDeleteBuffers(1, &VBO);
+  glDeleteVertexArrays(1, &firstTriangleVAO);
+  glDeleteBuffers(1, &firstTriangleVBO);
+
+  glDeleteVertexArrays(1, &secondTriangleVAO);
+  glDeleteBuffers(1, &secondTriangleVBO);
   glDeleteProgram(shaderProgram);
   glfwTerminate();
   return 0;

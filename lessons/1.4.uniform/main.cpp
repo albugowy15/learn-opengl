@@ -1,3 +1,4 @@
+#include <cmath>
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
@@ -5,19 +6,21 @@
 
 const char *vertex_shader_source = R"(
 #version 330 core
-layout(location = 0) in vec3 a_position;
+layout (location = 0) in vec3 aPos;
 
 void main() {
-  gl_Position = vec4(a_position, 1.0);
+  gl_Position = vec4(aPos, 1.0);
 }
 )";
 
 const char *fragment_shader_source = R"(
 #version 330 core
-out vec4 fragment_color;
+out vec4 FragColor;
+
+uniform vec4 ourColor;
 
 void main() {
-  fragment_color = vec4(1.0, 0.5, 0.2, 1.0);
+  FragColor = ourColor;
 }
 )";
 
@@ -103,6 +106,12 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(shaderProgram);
+
+    float timeValue = glfwGetTime();
+    float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
+    int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+    glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 

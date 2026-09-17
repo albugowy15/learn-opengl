@@ -1,25 +1,8 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
+#include <learnopengl/shader.h>
 
 #include <iostream>
-
-const char *vertex_shader_source = R"(
-#version 330 core
-layout(location = 0) in vec3 a_position;
-
-void main() {
-  gl_Position = vec4(a_position, 1.0);
-}
-)";
-
-const char *fragment_shader_source = R"(
-#version 330 core
-out vec4 fragment_color;
-
-void main() {
-  fragment_color = vec4(1.0, 0.5, 0.2, 1.0);
-}
-)";
 
 void framebufferSizeCallback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
@@ -68,20 +51,8 @@ int main() {
   };
   // clang-format on
 
-  const unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShader, 1, &vertex_shader_source, nullptr);
-  glCompileShader(vertexShader);
-
-  const unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &fragment_shader_source, nullptr);
-  glCompileShader(fragmentShader);
-
-  const unsigned int shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-  glLinkProgram(shaderProgram);
-  glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);
+  Shader ourShader(LEARNOPENGL_EXAMPLE_DIR "/shaders/shader.vs",
+                   LEARNOPENGL_EXAMPLE_DIR "/shaders/shader.fs");
 
   unsigned int VAO = 0;
   unsigned int VBO = 0;
@@ -102,7 +73,7 @@ int main() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(shaderProgram);
+    ourShader.use();
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -112,7 +83,6 @@ int main() {
 
   glDeleteVertexArrays(1, &VAO);
   glDeleteBuffers(1, &VBO);
-  glDeleteProgram(shaderProgram);
   glfwTerminate();
   return 0;
 }

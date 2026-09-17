@@ -42,7 +42,7 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   GLFWwindow *window =
-      glfwCreateWindow(800, 600, "Lesson 1.1: Triangle", nullptr, nullptr);
+      glfwCreateWindow(800, 600, "Exercise 1.1", nullptr, nullptr);
   if (window == nullptr) {
     std::cerr << "Failed to create GLFW window\n";
     glfwTerminate();
@@ -61,10 +61,15 @@ int main() {
 
   // clang-format off
   const float vertices[] = {
-    // first triangle
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f,
+    // left equilateral triangle
+    -0.8f, -0.5f, 0.0f,
+     0.0f, -0.5f, 0.0f,
+    -0.4f,  0.19282f, 0.0f,
+
+    // right equilateral triangle
+     0.0f, -0.5f, 0.0f,
+     0.8f, -0.5f, 0.0f,
+     0.4f,  0.19282f, 0.0f,
   };
   // clang-format on
 
@@ -104,7 +109,7 @@ int main() {
 
     glUseProgram(shaderProgram);
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

@@ -5,19 +5,24 @@
 
 const char *vertex_shader_source = R"(
 #version 330 core
-layout(location = 0) in vec3 a_position;
+layout (location = 0) in vec3 aPos;
+
+out vec4 vertexColor;
 
 void main() {
-  gl_Position = vec4(a_position, 1.0);
+  gl_Position = vec4(aPos, 1.0);
+  vertexColor = vec4(0.5, 0.0, 0.0, 1.0);
 }
 )";
 
 const char *fragment_shader_source = R"(
 #version 330 core
-out vec4 fragment_color;
+out vec4 FragColor;
+
+in vec4 vertexColor;
 
 void main() {
-  fragment_color = vec4(1.0, 0.5, 0.2, 1.0);
+  FragColor = vertexColor;
 }
 )";
 
@@ -42,7 +47,7 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   GLFWwindow *window =
-      glfwCreateWindow(800, 600, "Lesson 1.1: Triangle", nullptr, nullptr);
+      glfwCreateWindow(800, 600, "Lesson 1.2: Rectangle", nullptr, nullptr);
   if (window == nullptr) {
     std::cerr << "Failed to create GLFW window\n";
     glfwTerminate();
@@ -61,10 +66,15 @@ int main() {
 
   // clang-format off
   const float vertices[] = {
-    // first triangle
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f,
+     0.5f,  0.5f, 0.0f, // top right
+     0.5f, -0.5f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f, // bottom left
+    -0.5f,  0.5f, 0.0f, // top left
+  };
+
+  unsigned int indices[] = {
+    0, 1, 3, // first triangle
+    1, 2, 3 // second triangle
   };
   // clang-format on
 
@@ -83,18 +93,21 @@ int main() {
   glDeleteShader(vertexShader);
   glDeleteShader(fragmentShader);
 
-  unsigned int VAO = 0;
-  unsigned int VBO = 0;
+  unsigned int EBO, VAO, VBO;
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
+  glGenBuffers(1, &EBO);
 
-  // Configure the VAO once. It remembers that attribute 0 reads from vbo.
   glBindVertexArray(VAO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+               GL_STATIC_DRAW);
+
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
-  glBindVertexArray(0);
 
   while (glfwWindowShouldClose(window) == GLFW_FALSE) {
     processInput(window);
@@ -104,7 +117,8 @@ int main() {
 
     glUseProgram(shaderProgram);
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
